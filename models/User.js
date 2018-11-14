@@ -15,6 +15,14 @@ const UserSchema = new Schema({
       type: String,
       required: true,
     },
+    profilePic:{
+      type: String,
+      default: '#',
+    },
+    username: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,

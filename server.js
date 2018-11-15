@@ -13,9 +13,21 @@ app.use(bodyParser.urlencoded({
 
 //Multer
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 
-var cpUpload = upload.fields([{ name: 'firstName', maxCount: 1 }, { name: 'profilePic', maxCount: 1 }])
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${file.originalname}`)
+    }
+  })
+const upload = multer({ storage: storage })
+
+
+var cpUpload = upload.fields([
+    { name: 'firstName', maxCount: 1 }, 
+    { name: 'profilePic', maxCount: 1 }])
 app.post('/test', cpUpload, (req, res, next) => {
     console.log('Body = ', req.body);
     console.log('Files = ', req.files);

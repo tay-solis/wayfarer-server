@@ -5,15 +5,32 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-router.post('/signup', function(req, res) {
-   console.log('body----------------')
-   console.log(req.body);
-   console.log('params----------------')
-   console.log(req.params);
-   console.log('files----------------')
+//Multer
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${file.originalname}`)
+    }
+  })
+
+  const upload = multer({ storage: storage });
+
+
+const userUpload = upload.fields([
+   { name: 'firstName', maxCount: 1 },
+   { name: 'lastName', maxCount: 1},
+   { name: 'profilePic', maxCount: 1 },
+   { name: 'email', maxCount: 1 },
+   { name: 'username', maxCount: 1 },
+   { name: 'city', maxCount: 1},
+   { name: 'password', maxCount: 1 },
+   ])
+
+router.post('/signup', userUpload, function(req, res) {
+   console.log(req.body)
    console.log(req.files)
-   console.log('file----------------')
-   console.log(req.file)
 
    //Check if user exists with that username
    User.findOne({username: req.body.username}, (err, existingUser)=>{
@@ -30,8 +47,10 @@ router.post('/signup', function(req, res) {
                   city: req.body.city,
                   email: req.body.email  
                });
-               
 
+               user.profilePic = req.files.profilePic[0].path;
+
+               
                bcrypt.genSalt(10, (err, salt) => {
                   bcrypt.hash(req.body.password, salt, (err, hash) => {
                     if(err) throw err;
@@ -49,6 +68,9 @@ router.post('/signup', function(req, res) {
                   })
                
                });
+               // 
+
+               
             } else{
                console.log('Bad signup: Email already exists')
                res.status(403).json({

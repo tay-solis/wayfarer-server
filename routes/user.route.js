@@ -6,10 +6,18 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 router.post('/signup', function(req, res) {
+   console.log('body----------------')
+   console.log(req.body);
+   console.log('params----------------')
+   console.log(req.params);
+   console.log('files----------------')
+   console.log(req.files)
+   console.log('file----------------')
+   console.log(req.file)
+
    //Check if user exists with that username
    User.findOne({username: req.body.username}, (err, existingUser)=>{
       if (err) throw err;
-      console.log(existingUser)
       if(existingUser === null){
          User.findOne({email: req.body.email}, (err, existingEmail)=>{
             if(err) throw err;
@@ -20,10 +28,10 @@ router.post('/signup', function(req, res) {
                   lastName: req.body.lastName,
                   username: req.body.username,
                   city: req.body.city,
-                  profilePic: req.body.profilePic,
                   email: req.body.email  
                });
-      
+               
+
                bcrypt.genSalt(10, (err, salt) => {
                   bcrypt.hash(req.body.password, salt, (err, hash) => {
                     if(err) throw err;

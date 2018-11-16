@@ -32,29 +32,9 @@ app.use('/uploads', express.static(__dirname + '/uploads'))
 const user = require('./routes/user.route');
 app.use('/user', user);
 
-//User Profile
-// const profile = require('./routes/profile.route');
-// app.use('/profile', profile);
-
-// app.get('/profile/:username', (req,res )=>{
-//     db.User.findOne({username: username}, (err, user)=>{
-//         if (err) throw err;
-//         if (user === null){
-//             res.status(404).json({
-//                 error: "User not found."
-//             })
-//         } else {
-//             db.Profile.findOne({user: user})
-//                 .populate('User')
-//                 .populate('Posts')
-//                 .exec((err, profile)=>{
-//                     if (err) throw err;
-//                     res.json(profile);
-//                 })
-//         }
-//     })
-    
-// });
+// Auth Routes
+const posts = require('./routes/post.route');
+app.use('/posts', posts);
 
 app.get('/', (req, res) => {
     res.send('hey')

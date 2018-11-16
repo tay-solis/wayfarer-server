@@ -132,16 +132,18 @@ router.post('/login', function(req, res){
 
 /////// RETRIEVE USER INFO ///////
 router.get('/:username', (req,res)=>{
-   db.User.findOne({username: req.params.username})
-   // .populate('Profile')
-   .populate('Posts')
-   .exec((err, user)=>{
+   db.User.findOne({username: req.params.username}, (err, user)=>{
       if (err) throw err;
-      res.json(user);
+      db.Post.find({user: user}, (err, posts)=>{
+         if (err) throw err;
+         console.log(user)
+         res.json({
+            "user": user,
+            "posts": posts
+         });
+      })
+      
    })
-   // .catch((err)=>{
-   //    res.status(404).send(err);
-   // })  
 });
 
 module.exports = router;

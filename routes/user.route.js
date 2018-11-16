@@ -134,15 +134,7 @@ router.post('/login', function(req, res){
 router.get('/:username', (req,res)=>{
    db.User.findOne({username: req.params.username}, (err, user)=>{
       if (err) throw err;
-      db.Post.find({user: user}, (err, posts)=>{
-         if (err) throw err;
-         console.log(user)
-         res.json({
-            "user": user,
-            "posts": posts
-         });
-      })
-      
+      res.json(user)  
    })
 });
 

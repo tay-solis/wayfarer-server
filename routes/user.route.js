@@ -4,12 +4,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const db = require('../models')
 
 //Multer
 const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination: './uploads/',
+    destination: './uploads/profilePics',
     filename: function (req, file, cb) {
       cb(null, `${Date.now()}-${file.originalname}`)
     }
@@ -18,6 +19,7 @@ const storage = multer.diskStorage({
   const upload = multer({ storage: storage });
 
 
+/////// SIGN UP //////
 const userUpload = upload.fields([
    { name: 'firstName', maxCount: 1 },
    { name: 'lastName', maxCount: 1},
@@ -25,6 +27,7 @@ const userUpload = upload.fields([
    { name: 'email', maxCount: 1 },
    { name: 'username', maxCount: 1 },
    { name: 'city', maxCount: 1},
+   { name: 'joinDate', maxCount: 1},
    { name: 'password', maxCount: 1 },
    ])
 
@@ -45,6 +48,7 @@ router.post('/signup', userUpload, function(req, res) {
                   lastName: req.body.lastName,
                   username: req.body.username,
                   city: req.body.city,
+                  joinDate: req.body.joinDate,
                   email: req.body.email  
                });
 
@@ -87,6 +91,8 @@ router.post('/signup', userUpload, function(req, res) {
    })        
 });
 
+
+/////// LOG IN ///////
 router.post('/login', function(req, res){
 
    User.findOne({username: req.body.username}, (err, user)=>{
@@ -100,6 +106,7 @@ router.post('/login', function(req, res){
                     firstName: user.firstName,
                     lastName: user.lastName,
                     profilePic: user.profilePic,
+                    username: user.username,
                     _id: user._id
                   },
                   'secret',
@@ -122,4 +129,19 @@ router.post('/login', function(req, res){
       }
    });
 });
+
+/////// RETRIEVE USER INFO ///////
+router.get('/:username', (req,res)=>{
+   db.User.findOne({username: req.params.username})
+   // .populate('Profile')
+   .populate('Posts')
+   .exec((err, user)=>{
+      if (err) throw err;
+      res.json(user);
+   })
+   // .catch((err)=>{
+   //    res.status(404).send(err);
+   // })  
+});
+
 module.exports = router;

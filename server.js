@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path')
 const app = express();
 const port = process.env.PORT || 4000;
+const db = require('./models');
 
 
 //Parses json to url
@@ -10,39 +11,6 @@ app.use(bodyParser.urlencoded({
     extended: true
   }));
   app.use(bodyParser.json());
-
-//Multer
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-      cb(null, `${Date.now()}-${file.originalname}`)
-    }
-  })
-const upload = multer({ storage: storage })
-
-
-var cpUpload = upload.fields([
-    { name: 'firstName', maxCount: 1 }, 
-    { name: 'profilePic', maxCount: 1 }])
-app.post('/test', cpUpload, (req, res, next) => {
-    console.log('Body = ', req.body);
-    console.log('Files = ', req.files);
-    res.status(200).json({
-        body: req.body,
-        file: req.files
-    });
-    // req.files is an object (String -> Array) where fieldname is the key, and the value is array of files
-  //
-  // e.g.
-  //  req.files['avatar'][0] -> File
-  //  req.files['gallery'] -> Array
-  //
-  // req.body will contain the text fields, if there were any
-})
 
 
 //Mongoose
@@ -58,10 +26,35 @@ app.use(function(req, res, next) {
 });
 
 app.use(express.static('public'));
+app.use('/uploads', express.static(__dirname + '/uploads'))
 
 // Auth Routes
 const user = require('./routes/user.route');
 app.use('/user', user);
+
+//User Profile
+// const profile = require('./routes/profile.route');
+// app.use('/profile', profile);
+
+// app.get('/profile/:username', (req,res )=>{
+//     db.User.findOne({username: username}, (err, user)=>{
+//         if (err) throw err;
+//         if (user === null){
+//             res.status(404).json({
+//                 error: "User not found."
+//             })
+//         } else {
+//             db.Profile.findOne({user: user})
+//                 .populate('User')
+//                 .populate('Posts')
+//                 .exec((err, profile)=>{
+//                     if (err) throw err;
+//                     res.json(profile);
+//                 })
+//         }
+//     })
+    
+// });
 
 app.get('/', (req, res) => {
     res.send('hey')

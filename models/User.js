@@ -29,6 +29,15 @@ const UserSchema = new Schema({
     password: {
       type: String,
       required: true,
+    },
+    joinDate: Date,
+    posts:[{
+      type: Schema.Types.ObjectId,
+      ref: 'Posts'
+    }],
+    profile:{
+      type: Schema.Types.ObjectId,
+      ref: 'Profile'
     }
   });
 

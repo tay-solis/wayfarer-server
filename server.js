@@ -32,9 +32,13 @@ app.use('/uploads', express.static(__dirname + '/uploads'))
 const user = require('./routes/user.route');
 app.use('/user', user);
 
-// Auth Routes
+// Post Routes
 const posts = require('./routes/post.route');
 app.use('/posts', posts);
+
+// City Routes
+const city = require('./routes/city.route');
+app.use('/city', city);
 
 app.get('/', (req, res) => {
     res.send('hey')

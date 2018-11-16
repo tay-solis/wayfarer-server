@@ -15,8 +15,28 @@ router.get('/post/:id', (req,res)=>{
     })
 })
 
+// //Get all posts from a city
+router.get('/from/:cityname', (req, res)=>{
+    console.log(`retrieving posts about ${req.params.cityname}`);
+    db.City.findOne({name: req.params.cityname}, (err, city)=>{
+        if(err) throw err;
+        if (city === null){
+            res.status(404).json({
+                error: 'city not found'
+            })
+        } else{
+            db.Post.find({city: city})
+            .populate({path: 'user', model: db.User})
+            .exec((err, posts)=>{
+                if(err) throw err;
+                res.json(posts)
+            })
+        }
+    })
+})
+
 //Get all posts from a user
-router.get('/:username', (req, res)=>{
+router.get('/author/:username', (req, res)=>{
     console.log(`retrieving posts by ${req.params.username}`);
     db.User.findOne({username: req.params.username}, (err, user)=>{
         if(err) throw err;
@@ -49,22 +69,32 @@ router.post('/create', (req, res) => {
 
     db.Post.create(postData, (err, savedPost) => {
         if (err) throw err;
-        db.User.findOne({
-            username: req.body.user.username
-        }, (err, savedUser) => {
-            if (err) throw err;
-            savedUser.posts.push(savedPost);
-            savedUser.save((err, savedUser) => {
+        db.City.findOne({name: req.body.city}, (err, savedCity)=>{
+            if(err) throw err;
+            db.User.findOne({
+                username: req.body.user.username
+            }, (err, savedUser) => {
                 if (err) throw err;
-                console.log(`Saved post to ${savedUser.username}`)
-            });
-            savedPost.user = savedUser;
-            savedPost.save((err, savedPost) => {
-                if (err) throw err;
-                console.log(`Saved ${savedPost}`)
-            });
-            res.json(savedPost)
+                savedCity.posts.push(savedPost);
+                savedCity.save((err, savedCity)=>{
+                    if(err) throw err;
+                    console.log(savedCity)
+                });
+                savedUser.posts.push(savedPost);
+                savedUser.save((err, savedUser)=>{
+                    if(err) throw err;
+                    console.log(savedUser)
+                });
+                savedPost.user = savedUser;
+                savedPost.city = savedCity;
+                savedPost.save((err, savedPost) => {
+                    if (err) throw err;
+                    console.log(`Saved ${savedPost}`)
+                });
+                res.json(savedPost)
+            })
         })
+        
     });
 });
 

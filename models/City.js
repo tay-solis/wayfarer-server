@@ -7,6 +7,10 @@ const CitySchema = new Schema({
         type: String,
         default: ''
     },
+    country:{
+        type: String,
+        default: 'Somewhere in the World...'
+    },
     photo:{
         type: String,
         default: '#'

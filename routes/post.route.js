@@ -47,6 +47,7 @@ router.get('/author/:username', (req, res)=>{
         } else{
             db.Post.find({user: user})
             .populate({path: 'user', model: db.User})
+            .populate({path: 'city', model: db.City})
             .exec((err, posts)=>{
                 if(err) throw err;
                 res.json(posts)

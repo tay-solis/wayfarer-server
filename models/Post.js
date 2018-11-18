@@ -19,7 +19,7 @@ const PostSchema = new Schema({
         type: String,
         default: ''
     }, 
-    postedOn: Date,
+    postedOn: Number,
       
   });
 

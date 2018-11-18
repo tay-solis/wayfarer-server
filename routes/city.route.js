@@ -25,6 +25,7 @@ const cityUpload = upload.fields([
 
 //Add a new city
 router.post('/create', cityUpload, (req, res) => { 
+    console.log(req.body)
     db.City.findOne({name: req.body.name}, (err, city)=>{
         if (err) throw err;
         if(city === null){
@@ -32,6 +33,7 @@ router.post('/create', cityUpload, (req, res) => {
             let cityData ={
                 _id: new mongoose.Types.ObjectId(),
                 name: req.body.name,
+                country: req.body.country,
                 photo: req.files.photo[0].path 
             }
             db.City.create(cityData, (err, newCity)=>{

@@ -9,6 +9,7 @@ router.get('/post/:id', (req,res)=>{
     console.log(`looking for post ${req.params.id}`)
     db.Post.findOne({_id: req.params.id})
     .populate({path: 'user', model: db.User})
+    .populate({path: 'city', model: db.City})
     .exec((err, post)=>{
         if(err) throw err;
         res.json(post)

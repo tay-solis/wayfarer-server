@@ -130,6 +130,51 @@ router.post('/login', function(req, res){
    });
 });
 
+const profilePicUpdate = upload.fields([
+   {name: 'profilePic', maxCount:1}
+   ])
+
+// EDIT A USER PROFILE PIC
+router.put('/editprofilepic/:username', profilePicUpdate, (req,res)=>{
+let username = req.params.username;
+ console.log(`Updating ${username}'s profile`);
+ let updateBody = req.body;
+ console.log(req.body)
+ updateBody.profilePic = req.files.profilePic[0].path;
+ db.User.findOneAndUpdate({username: username}, updateBody, (err, updatedUser) =>{
+   if(err) return console.log(`Could not update ${username}: ${err}`);
+   if(updatedUser == null) console.log(`could not find ${username}`)
+   res.json(updatedUser);
+ });
+
+})
+
+
+const userUpdate = upload.fields([
+   { name: 'firstName', maxCount: 1 },
+   { name: 'lastName', maxCount: 1},
+   { name: 'profilePic', maxCount: 1 },
+   { name: 'email', maxCount: 1 },
+   { name: 'city', maxCount: 1},
+   ])
+
+// EDIT A USER PROFILE
+router.put('/edit/:username', userUpdate, (req,res)=>{
+   let username = req.params.username;
+ console.log(`Updating ${username}'s profile`);
+ let updateBody = req.body;
+ console.log(req.body)
+ if(req.files.profilePic) updateBody.profilePic = req.files.profilePic[0].path;
+ db.User.findOneAndUpdate({username: username}, updateBody, (err, updatedUser) =>{
+   if(err) return console.log(`Could not update ${username}: ${err}`);
+   if(updatedUser == null) console.log(`could not find ${username}`)
+   res.json(updatedUser);
+ });
+
+})
+
+
+
 /////// RETRIEVE USER INFO ///////
 router.get('/:username', (req,res)=>{
    db.User.findOne({username: req.params.username}, (err, user)=>{
@@ -137,5 +182,6 @@ router.get('/:username', (req,res)=>{
       res.json(user)  
    })
 });
+
 
 module.exports = router;

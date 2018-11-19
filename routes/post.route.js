@@ -100,4 +100,32 @@ router.post('/create', (req, res) => {
     });
 });
 
+//EDIT A POST
+router.put('/edit/:id', (req,res)=>{
+    let postId = req.params.id;
+  console.log(`Updating ${postId}...`);
+  let updateBody = req.body;
+  
+  db.Post.findOneAndUpdate({_id: postId}, updateBody, {new:true}, (err, updatedPost) =>{
+    if(err) return console.log(`Could not update ${postId}: ${err}`);
+    res.json(updatedPost);
+  });
+
+})
+
+//DESTROY A POST
+router.delete('/delete/:id', (req, res)=>{
+    let postId = req.params.id;
+  console.log(`Deleting ${postId}...`);
+  db.Post.deleteOne({
+    _id: postId
+  }, (err, deletedPost) => {
+    if (err) throw err;
+    res.status(200).json({
+        "Deleted Post": deletedPost
+    })
+  })
+
+})
+
 module.exports = router;

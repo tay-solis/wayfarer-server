@@ -5,26 +5,29 @@ const port = process.env.PORT || 4000;
 const db = require('./models');
 
 
-//Parses json to url
+//JSON to url parser
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
     extended: true
-  }));
-  app.use(bodyParser.json());
+}));
+app.use(bodyParser.json());
 
 
 //Mongoose
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/jwtauth', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost/jwtauth', {
+    useNewUrlParser: true
+});
 
 //CORS
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
     next();
 });
 
+//Static Files and Image Upload Paths
 app.use(express.static('public'));
 app.use('/uploads', express.static(__dirname + '/uploads'))
 
@@ -40,6 +43,7 @@ app.use('/posts', posts);
 const city = require('./routes/city.route');
 app.use('/city', city);
 
+// Home Route for Testing
 app.get('/', (req, res) => {
     res.send('hey')
 });

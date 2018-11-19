@@ -10,114 +10,144 @@ const db = require('../models')
 const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination: './uploads/profilePics',
-    filename: function (req, file, cb) {
+   destination: './uploads/profilePics',
+   filename: function (req, file, cb) {
       cb(null, `${Date.now()}-${file.originalname}`)
-    }
-  })
+   }
+})
 
-  const upload = multer({ storage: storage });
+const upload = multer({
+   storage: storage
+});
 
 
 /////// SIGN UP //////
-const userUpload = upload.fields([
-   { name: 'firstName', maxCount: 1 },
-   { name: 'lastName', maxCount: 1},
-   { name: 'profilePic', maxCount: 1 },
-   { name: 'email', maxCount: 1 },
-   { name: 'username', maxCount: 1 },
-   { name: 'city', maxCount: 1},
-   { name: 'joinDate', maxCount: 1},
-   { name: 'password', maxCount: 1 },
-   ])
+const userUpload = upload.fields([{
+      name: 'firstName',
+      maxCount: 1
+   },
+   {
+      name: 'lastName',
+      maxCount: 1
+   },
+   {
+      name: 'profilePic',
+      maxCount: 1
+   },
+   {
+      name: 'email',
+      maxCount: 1
+   },
+   {
+      name: 'username',
+      maxCount: 1
+   },
+   {
+      name: 'city',
+      maxCount: 1
+   },
+   {
+      name: 'joinDate',
+      maxCount: 1
+   },
+   {
+      name: 'password',
+      maxCount: 1
+   },
+])
 
-router.post('/signup', userUpload, function(req, res) {
+router.post('/signup', userUpload, function (req, res) {
    console.log(req.body)
    console.log(req.files)
 
    //Check if user exists with that username
-   User.findOne({username: req.body.username}, (err, existingUser)=>{
+   User.findOne({
+      username: req.body.username
+   }, (err, existingUser) => {
       if (err) throw err;
-      if(existingUser === null){
-         User.findOne({email: req.body.email}, (err, existingEmail)=>{
-            if(err) throw err;
-            if(existingEmail === null){
+      if (existingUser === null) {
+         User.findOne({
+            email: req.body.email
+         }, (err, existingEmail) => {
+            if (err) throw err;
+            if (existingEmail === null) {
                const user = new User({
-                  _id: new  mongoose.Types.ObjectId(),
+                  _id: new mongoose.Types.ObjectId(),
                   firstName: req.body.firstName,
                   lastName: req.body.lastName,
                   username: req.body.username,
                   city: req.body.city,
                   joinDate: req.body.joinDate,
-                  email: req.body.email  
+                  email: req.body.email
                });
 
                user.profilePic = req.files.profilePic[0].path;
 
-               
+
                bcrypt.genSalt(10, (err, salt) => {
                   bcrypt.hash(req.body.password, salt, (err, hash) => {
-                    if(err) throw err;
-                    user.password = hash;
-                    user.save().then(function(result) {
-                      console.log(result);
-                      res.status(200).json({
-                         success: 'New user has been created'
-                      });
-                   }).catch(err=> {
-                      res.status(500).json({
-                         error: err
-                      });
+                     if (err) throw err;
+                     user.password = hash;
+                     user.save().then(function (result) {
+                        console.log(result);
+                        res.status(200).json({
+                           success: 'New user has been created'
+                        });
+                     }).catch(err => {
+                        res.status(500).json({
+                           error: err
+                        });
                      })
                   })
-               
+
                });
                // 
 
-               
-            } else{
+
+            } else {
                console.log('Bad signup: Email already exists')
                res.status(403).json({
                   error: 'Email already exists'
                });
             }
          })
-      } else{
+      } else {
          console.log('Bad signup: Username already exists')
-               res.status(403).json({
-                  error: 'Username already exists'
-               });
+         res.status(403).json({
+            error: 'Username already exists'
+         });
       }
-   })        
+   })
 });
 
 
 /////// LOG IN ///////
-router.post('/login', function(req, res){
+router.post('/login', function (req, res) {
 
-   User.findOne({username: req.body.username}, (err, user)=>{
-      if(err) throw err;
-      if (user !== null){
-         bcrypt.compare(req.body.password, user.password, (err, result)=>{
+   User.findOne({
+      username: req.body.username
+   }, (err, user) => {
+      if (err) throw err;
+      if (user !== null) {
+         bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (err) throw err;
-            if(result) {
+            if (result) {
                const JWTToken = jwt.sign({
-                    username: user.username,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    profilePic: user.profilePic,
-                    username: user.username,
-                    _id: user._id
+                     username: user.username,
+                     firstName: user.firstName,
+                     lastName: user.lastName,
+                     profilePic: user.profilePic,
+                     username: user.username,
+                     _id: user._id
                   },
-                  'secret',
-                   {
+                  'secret', {
                      expiresIn: '2h'
-                   });
-                   return res.status(200).json({
-                     success: 'Welcome back!',
-                     token: JWTToken
-                   });
-              }
+                  });
+               return res.status(200).json({
+                  success: 'Welcome back!',
+                  token: JWTToken
+               });
+            }
             return res.status(401).json({
                failed: 'Credentials not valid'
             });
@@ -130,56 +160,77 @@ router.post('/login', function(req, res){
    });
 });
 
-const profilePicUpdate = upload.fields([
-   {name: 'profilePic', maxCount:1}
-   ])
+const profilePicUpdate = upload.fields([{
+   name: 'profilePic',
+   maxCount: 1
+}])
 
-// EDIT A USER PROFILE PIC
-router.put('/editprofilepic/:username', profilePicUpdate, (req,res)=>{
-let username = req.params.username;
- console.log(`Updating ${username}'s profile`);
- let updateBody = req.body;
- console.log(req.body)
- updateBody.profilePic = req.files.profilePic[0].path;
- db.User.findOneAndUpdate({username: username}, updateBody, (err, updatedUser) =>{
-   if(err) return console.log(`Could not update ${username}: ${err}`);
-   if(updatedUser == null) console.log(`could not find ${username}`)
-   res.json(updatedUser);
- });
+/////// EDIT A USER PROFILE PIC ///////
+router.put('/editprofilepic/:username', profilePicUpdate, (req, res) => {
+   let username = req.params.username;
+   console.log(`Updating ${username}'s profile`);
+   let updateBody = req.body;
+   console.log(req.body)
+   updateBody.profilePic = req.files.profilePic[0].path;
+   db.User.findOneAndUpdate({
+      username: username
+   }, updateBody, (err, updatedUser) => {
+      if (err) return console.log(`Could not update ${username}: ${err}`);
+      if (updatedUser == null) console.log(`could not find ${username}`)
+      res.json(updatedUser);
+   });
 
 })
 
-
-const userUpdate = upload.fields([
-   { name: 'firstName', maxCount: 1 },
-   { name: 'lastName', maxCount: 1},
-   { name: 'profilePic', maxCount: 1 },
-   { name: 'email', maxCount: 1 },
-   { name: 'city', maxCount: 1},
-   ])
+/////// UPDATE PROFILE ///////
+const userUpdate = upload.fields([{
+      name: 'firstName',
+      maxCount: 1
+   },
+   {
+      name: 'lastName',
+      maxCount: 1
+   },
+   {
+      name: 'profilePic',
+      maxCount: 1
+   },
+   {
+      name: 'email',
+      maxCount: 1
+   },
+   {
+      name: 'city',
+      maxCount: 1
+   },
+])
 
 // EDIT A USER PROFILE
-router.put('/edit/:username', userUpdate, (req,res)=>{
+router.put('/edit/:username', userUpdate, (req, res) => {
    let username = req.params.username;
- console.log(`Updating ${username}'s profile`);
- let updateBody = req.body;
- console.log(req.body)
- if(req.files.profilePic) updateBody.profilePic = req.files.profilePic[0].path;
- db.User.findOneAndUpdate({username: username}, updateBody, (err, updatedUser) =>{
-   if(err) return console.log(`Could not update ${username}: ${err}`);
-   if(updatedUser == null) console.log(`could not find ${username}`)
-   res.json(updatedUser);
- });
+   console.log(`Updating ${username}'s profile`);
+   let updateBody = req.body;
+   console.log(req.body)
+   if (req.files.profilePic) updateBody.profilePic = req.files.profilePic[0].path;
+   db.User.findOneAndUpdate({
+      username: username
+   }, updateBody, (err, updatedUser) => {
+      if (err) return console.log(`Could not update ${username}: ${err}`);
+      if (updatedUser == null) console.log(`could not find ${username}`)
+      res.json(updatedUser);
+   });
 
 })
 
 
 
 /////// RETRIEVE USER INFO ///////
-router.get('/:username', (req,res)=>{
-   db.User.findOne({username: req.params.username}, (err, user)=>{
+router.get('/:username', (req, res) => {
+   db.User.findOne({
+      username: req.params.username
+   }, (err, user) => {
       if (err) throw err;
-      res.json(user)  
+      res.json(user)
    })
 });
 

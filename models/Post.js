@@ -3,25 +3,25 @@ const Schema = mongoose.Schema;
 
 const PostSchema = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    user:{
+    user: {
         type: Schema.Types.ObjectId,
         ref: 'user'
     },
-    city:{
+    city: {
         type: Schema.Types.ObjectId,
         ref: 'city'
     },
-    title:{
+    title: {
         type: String,
         default: ''
     },
-    content:{
+    content: {
         type: String,
         default: ''
-    }, 
+    },
     postedOn: Number,
-      
-  });
+
+});
 
 const Post = mongoose.model('Post', PostSchema);
 

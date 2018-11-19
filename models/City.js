@@ -3,24 +3,24 @@ const Schema = mongoose.Schema;
 
 const CitySchema = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    name:{
+    name: {
         type: String,
         default: ''
     },
-    country:{
+    country: {
         type: String,
         default: 'Somewhere in the World...'
     },
-    photo:{
+    photo: {
         type: String,
         default: '#'
     },
-    posts:[{
+    posts: [{
         type: Schema.Types.ObjectId,
         ref: 'posts'
-    }], 
-      
-  });
+    }],
+
+});
 
 const City = mongoose.model('City', CitySchema);
 

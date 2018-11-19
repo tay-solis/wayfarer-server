@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/wayfarer", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/wayfarer", {
+    useNewUrlParser: true
+});
 
 // module.exports.MODELNAME = require('./MODELFILE');
 module.exports.Post = require('./Post')

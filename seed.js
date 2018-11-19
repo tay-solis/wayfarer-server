@@ -1,7 +1,7 @@
 const db = require('./models');
 const mongoose = require('mongoose');
 
-
+// Run to clear database
 db.City.deleteMany({}, (err, deletedCities)=>{
     if(err) throw err;
     db.User.deleteMany({}, (err, deletedUsers)=>{

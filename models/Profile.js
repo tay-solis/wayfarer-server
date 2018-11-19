@@ -3,15 +3,15 @@ const Schema = mongoose.Schema;
 
 const ProfileSchema = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    user:{
+    user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    bio:{
+    bio: {
         type: String,
         default: ''
-    },  
-  });
+    },
+});
 
 const Profile = mongoose.model('Profile', ProfileSchema);
 
